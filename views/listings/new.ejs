@@ -1,0 +1,65 @@
+<% layout("/layouts/boilerplate.ejs")%>
+
+    <div class="row">
+        <div class="col-8 offset-2">
+            <br><br>
+            <h3>Create a new Listing</h3>
+    <form method="post" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input name="listing[title]"  type="text" class="form-control" placeholder="Add a catchy title" required >
+            <div class="valid-feedback">Title looks good !</div>
+
+        </div>
+        
+       <div class="mb-3"> 
+        <label for="description" class="form-label">Description</label>
+        <textarea name="listing[description]"  type="text" class="form-control" required ></textarea>
+        <div class="invalid-feedback">Please enter  a short description</div>
+       </div>
+
+         <div class="mb-3">
+            <label for="image" class="form-label">Upload Image</label>
+            <input name="listing[image]" type="file"  class="form-control" required/>
+             </div>
+         <div class="row">
+        <div class="mb-3 col-md-4">
+        <label for="price" class="form-label">Price</label>
+        <input name="listing[price]"  class="form-control" placeholder="1200" required >
+        <div class="invalid-feedback">Price should be valid</div>
+        </div>
+        <div class="mb-3 col-md-8"> 
+            <label for="country" class="form-label">Country</label>
+        <input name="listing[country]" type="text"  class="form-control" placeholder="India" required >
+        <div class="invalid-feedback">Country should be valid </div>
+        </div>
+        </div>
+
+
+        <div class="mb-3"> 
+            <label for="location" class="form-label">Location</label>
+            <input name="listing[location]" type="text"  class="form-control" placeholder="Jaipur ,Rajashthan,India" required >
+            <div class="invalid-feedback">Location should be valid</div>
+        </div>
+        <div class="mb-3"> 
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select" id="category" aria-label="Select categories">
+                <option value="">Select categories</option> <!-- Placeholder option -->
+                <option value="Mountain">Mountain</option>
+                <option value="Camping">Camping</option>
+                <option value="Farms">Farms</option>
+                <option value="Trending">Trending</option>
+                <option value="Castles">Castles</option>
+                <option value="Amazing">Amazing</option>
+                <option value="Arctic">Arctic</option>
+                <option value="Rooms">Rooms</option>
+                <option value="Iconic cities">Iconic cities</option>
+            </select>
+        </div>
+        <br><br>
+        <button class="btn btn-dark add-btn">add</button>
+        <br><br>
+    </form>
+    </div>
+    </div>
