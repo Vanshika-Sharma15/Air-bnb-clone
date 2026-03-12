@@ -1,3 +1,4 @@
+
 const Listing=require("../models/listing.js");
 const GeoJSON = require('geojson');
 
@@ -28,59 +29,182 @@ module.exports.showListing=async(req,res)=>{
       res.render("listings/show.ejs",{listing});
       
 };
-  module.exports.createListing=async (req,res,next)=>{
-    // let response=await geoCodingClient
-    // .forwardGeocode({
-    //     query:req.body.listing.location,
-    //     limit: 1,
-    //   })
-    //     .send();
-    // console.log(response.body.feature[0].geometry);
-    // res.send("done");
+module.exports.createListing = async (req,res)=>{
 
- const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(req.body.listing.location)}`;
-// Make the API request to Nominatim
-const response = await fetch(url2);
+console.log("Create listing controller started");
+console.log(req.body);
+
+const url2 = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(req.body.listing.location)}`;
+
+const response = await fetch(url2,{
+    headers:{ "User-Agent":"airbnb-clone" }
+});
+
 const data = await response.json();
- // Check if we received any results
-if (data.length > 0) {
-    const coordinates = {
-        latitude: parseFloat(data[0].lat), // Convert to float
-        longitude: parseFloat(data[0].lon)  // Convert to float
-            };
-        console.log("Coordinates:", coordinates);
-        const geojson = {
-            type: "FeatureCollection",
-            features: [
-                {
-                    type: "Feature",
-                    properties: {
-                        name: req.body.listing.location // Include the location name
-                    },
-                    geometry: {
-                        type: "Point",
-                        coordinates: [coordinates.longitude, coordinates.latitude] // [longitude, latitude]
-                    }
-                }]
-            }
+
+console.log("API response:",data);
+
+if(data.length === 0){
+    req.flash("error","Location not found");
+    return res.redirect("/listings/new");
+}
+
+if(!req.file){
+    req.flash("error","Image upload failed");
+    return res.redirect("/listings/new");
+}
+
+const geometry = {
+    type:"Point",
+    coordinates:[
+        parseFloat(data[0].lon),
+        parseFloat(data[0].lat)
+    ]
+};
+
+let url=req.file.path;
+let filename=req.file.filename;
+
+const newListing=new Listing(req.body.listing);
+
+newListing.owner=req.user._id;
+newListing.image={url,filename};
+newListing.geometry=geometry;
+
+await newListing.save();
+
+req.flash("success","New Listing Created!");
+res.redirect("/listings");
+};
+// module.exports.createListing = async (req, res) => {
+// const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(req.body.listing.location)}`;
+
+// const response = await fetch(url2,{
+//     headers:{
+//         "User-Agent":"airbnb-clone-app"
+//     }
+// });
+
+// const data = await response.json();
+// console.log(data);
+
+// if (data.length === 0) {
+//     req.flash("error","Location not found");
+//     return res.redirect("/listings/new");
+// }
+
+// const coordinates = {
+//     latitude: parseFloat(data[0].lat),
+//     longitude: parseFloat(data[0].lon)
+// };
+
+// const geojson = {
+//     type: "Point",
+//     coordinates: [coordinates.longitude, coordinates.latitude]
+// };
+
+// if(!req.file){
+//     req.flash("error","Image upload failed");
+//     return res.redirect("/listings/new");
+// }
+
+// let url = req.file.path;
+// let filename = req.file.filename;
+
+// const newListing = new Listing(req.body.listing);
+
+// newListing.owner = req.user._id;
+// newListing.image = { url, filename };
+// newListing.geometry = geojson;
+
+// await newListing.save();
+
+// req.flash("success","New Listing created!");
+// res.redirect("/listings");
+// };
+// module.exports.createListing = async (req,res)=>{
+
+// const url2 = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(req.body.listing.location)}`;
+
+// const response = await fetch(url2,{
+//     headers:{
+//         "User-Agent":"airbnb-clone-app"
+//     }
+// });
+
+// const data = await response.json();
+
+// if(data.length === 0){
+//     req.flash("error","Location not found");
+//     return res.redirect("/listings/new");
+// }
+
+// const geometry = {
+//     type: "Point",
+//     coordinates: [
+//         parseFloat(data[0].lon),
+//         parseFloat(data[0].lat)
+//     ]
+// };
+
+// let url = req.file.path;
+// let filename = req.file.filename;
+
+// const newListing = new Listing(req.body.listing);
+
+// newListing.owner = req.user._id;
+// newListing.image = {url,filename};
+// newListing.geometry = geometry;
+
+// await newListing.save();
+
+// req.flash("success","New Listing Created!");
+// res.redirect("/listings");
+// };
+// module.exports.createListing=async (req,res)=>{
+// const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(req.body.listing.location)}`;
+// // Make the API request to Nominatim
+// const response = await fetch(url2);
+// const data = await response.json();
+//  // Check if we received any results
+// if (data.length > 0) {
+//     const coordinates = {
+//         latitude: parseFloat(data[0].lat), // Convert to float
+//         longitude: parseFloat(data[0].lon)  // Convert to float
+//             };
+//         console.log("Coordinates:", coordinates);
+//         const geojson = {
+//             type: "FeatureCollection",
+//             features: [
+//                 {
+//                     type: "Feature",
+//                     properties: {
+//                         name: req.body.listing.location // Include the location name
+//                     },
+//                     geometry: {
+//                         type: "Point",
+//                         coordinates: [coordinates.longitude, coordinates.latitude] // [longitude, latitude]
+//                     }
+//                 }]
+//             }
 
     
-        // return res.json(geojson);
+//         // return res.json(geojson);
                  
     
-    let url=req.file.path;
-    let filename=req.file.filename;
-    console.log(url,filename);
-    const newListing=new Listing(req.body.listing);
-    newListing.owner=req.user._id;
-    newListing.image={url,filename};
-    newListing.geometry=geojson.features[0].geometry; 
-    let savedlisting=await newListing.save();
-    console.log(savedlisting);
-    req.flash("success","New Listing created !");
-    res.redirect("/listings");
-        }
-};
+//     let url=req.file.path;
+//     let filename=req.file.filename;
+//     console.log(url,filename);
+//     const newListing=new Listing(req.body.listing);
+//     newListing.owner=req.user._id;
+//     newListing.image={url,filename};
+//     newListing.geometry=geojson.features[0].geometry; 
+//     let savedlisting=await newListing.save();
+//     console.log(savedlisting);
+//     req.flash("success","New Listing created !");
+//     res.redirect("/listings");
+//         }
+// };
 module.exports.renderEditForm=async (req,res)=>{
          let {id}=req.params;
          let listing=await Listing.findById(id);
