@@ -84,7 +84,7 @@ app.use((req,res,next)=>{
 
 
 app.get("/",(req,res)=>{
-res.render("listings/root.ejs");
+res.redirect("/listings");
 });
 app.use("/listings",listingsRouter);
 app.use("/listings/:id/reviews",reviewsRouter);
